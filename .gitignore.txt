@@ -1,0 +1,12 @@
+# Python 垃圾檔
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虛擬環境 (Anaconda 環境通常不在這，但預防萬一)
+.venv/
+env/
+venv/
+
+# 敏感資訊 (如果你有把 Key 寫在 .env 檔的話)
+.env
