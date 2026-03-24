@@ -185,8 +185,9 @@ def calculate_strategy_metrics(df, sim_contract, sim_qty, margin_per_contract, e
     
     current_dd = df['Drawdown_TWD'].iloc[-1]
     dd_ratio = (abs(current_dd) / mdd_abs) if mdd_abs > 0 else 0
-    
-    if dd_ratio >= 1.5: status = '🔴 策略失效'
+    if sim_qty == 0:
+        status = '⚪ 不列入分析'
+    elif dd_ratio >= 1.5: status = '🔴 策略失效'
     elif dd_ratio >= 1.0: status = '🟠 進入未知'
     elif dd_ratio >= 0.8 or (not pd.isna(avg_rec_days) and curr_under_days > (avg_rec_days * 2)): status = '🟡 性能鈍化'
     else: status = '🟢 穩定運行'
