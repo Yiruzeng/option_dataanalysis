@@ -6,28 +6,36 @@ import plotly.express as px
 import yfinance as yf
 
 # ==========================================
-# 1. 系統初始化與【UI 視覺強勢鎖定】
+# 1. 系統初始化與【全域主題防禦】樣式定義
 # ==========================================
 st.set_page_config(page_title="ProQuant 旗艦戰情室", page_icon="🛡️", layout="wide")
 
 st.markdown("""
 <style>
-    /* 1. 全域背景與基礎深灰文字鎖定 */
-    html, body, [data-testid="stAppViewContainer"] {
+    /* 1. 強制全域背景與標頭鎖定 (關鍵：鎖定 .main 與 .header) */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
         background-color: #F4F6F8 !important;
         color: #333333 !important;
     }
+    
+    /* 移除深色模式下 Header 的半透明效果 */
+    [data-testid="stHeader"] {
+        background: #F4F6F8 !important;
+    }
 
-    /* 2. 側邊欄與內部標籤鎖定 */
+    /* 2. 側邊欄強制純白與邊框鎖定 */
     [data-testid="stSidebar"] {
         background-color: #FFFFFF !important;
         border-right: 1px solid #EBEBEB !important;
     }
-    [data-testid="stSidebar"] .stMarkdown, [data-testid="stSidebar"] label, [data-testid="stSidebar"] span {
+    /* 鎖定側邊欄內的文字與標籤 */
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] span {
         color: #333333 !important;
     }
 
-    /* 3. 白色圓角卡片容器鎖定 */
+    /* 3. 數據卡片與容器樣式鎖定 */
     div[data-testid="stMetric"], div[data-testid="stDataFrame"], .stExpander {
         background-color: #FFFFFF !important;
         padding: 20px !important;
@@ -36,17 +44,30 @@ st.markdown("""
         box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.04) !important;
     }
     
-    /* 4. 科技藍紫數字與指標數值鎖定 */
+    /* 4. 強制藍紫色鎖定：標題與指標數值 */
+    h1, h2, h3, h4, h5, h6,
+    h1 span, h2 span, h3 span, h4 span,
     div[data-testid="stMetricValue"] > div,
     div[data-testid="stMetricValue"] span,
     div[data-testid="stMetricValue"] p {
         color: #4F46E5 !important;
-        font-weight: 400 !important;
+        font-weight: bold !important;
         background: none !important;
-        -webkit-text-fill-color: initial !important; 
+        -webkit-text-fill-color: initial !important; /* 保護 Emoji 原色 */
     }
-    
-    /* 5. 強制純白按鈕文字鎖定 */
+
+    /* 5. 藍色提示框 (st.info) 強制鎖定 */
+    div[class*="stInfo"] {
+        background-color: #EBF5FF !important; /* 輕量粉藍 */
+        color: #1E40AF !important; /* 深藍文字 */
+        border: 1px solid #BFDBFE !important;
+        border-radius: 12px !important;
+    }
+    div[class*="stInfo"] p, div[class*="stInfo"] span {
+        color: #1E40AF !important;
+    }
+
+    /* 6. 按鈕文字強制白色鎖定 */
     .stButton>button, .stButton>button div, .stButton>button p, .stButton>button span {
         color: #FFFFFF !important;
         font-weight: 600 !important;
@@ -55,19 +76,25 @@ st.markdown("""
         background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%) !important;
         border: none !important;
         border-radius: 12px !important; 
-        padding: 0.5rem 1rem !important;
-        width: 100% !important;
         box-shadow: 0px 4px 10px rgba(79, 70, 229, 0.3) !important;
     }
 
-    /* 6. 科技藍紫標題鎖定 */
-    h1, h2, h3, h4, h1 span, h2 span, h3 span, h4 span {
-        color: #4F46E5 !important;
-        font-weight: bold !important;
+    /* 7. 所有輸入框、數字選取器樣式鎖定 */
+    div[data-baseweb="input"], div[data-baseweb="select"], .stNumberInput input {
+        background-color: #FFFFFF !important;
+        color: #333333 !important;
+        border: 1px solid #D1D5DB !important;
+        border-radius: 8px !important;
     }
     
-    /* 7. 其他文字鎖定深灰 */
-    .stMarkdown p, .stMarkdown li, span[data-testid="stMarkdownContainer"] p {
+    /* 鎖定輸入框文字與佔位符 */
+    input {
+        color: #333333 !important;
+        -webkit-text-fill-color: #333333 !important;
+    }
+
+    /* 8. 其他全域一般文字鎖定深灰 */
+    p, li, span, label {
         color: #333333 !important;
     }
     
