@@ -6,26 +6,31 @@ import plotly.express as px
 import yfinance as yf
 
 # ==========================================
-# 1. 系統初始化與視覺樣式定義 (藍紫科技白底風格)
+# 1. 系統初始化與【UI 視覺最終強勢鎖定】
 # ==========================================
 st.set_page_config(page_title="ProQuant 旗艦戰情室", page_icon="🛡️", layout="wide")
 
-# 注入自定義 CSS (修正 Emoji 滿版色塊問題)
+# 強制樣式鎖定：CSS確保所有電腦顯示一致，修正按鈕文字白色、數字標題藍紫、一般文字深灰
 st.markdown("""
 <style>
-    /* 整體背景色 (非常淺的灰白，凸顯白色圓角卡片) */
-    .stApp {
-        background-color: #F4F6F8;
-        color: #333333;
-    }
-    
-    /* 側邊欄背景改為純白 */
-    [data-testid="stSidebar"] {
-        background-color: #FFFFFF !important;
-        border-right: 1px solid #EBEBEB;
+    /* 1. 全域背景與基礎深灰文字鎖定 */
+    html, body, [data-testid="stAppViewContainer"] {
+        background-color: #F4F6F8 !important;
+        color: #333333 !important;
     }
 
-    /* 數據卡片、表格、擴展面板 - 白色大圓角卡片帶輕微陰影 */
+    /* 2. 側邊欄與內部標籤鎖定 */
+    [data-testid="stSidebar"] {
+        background-color: #FFFFFF !important;
+        border-right: 1px solid #EBEBEB !important;
+    }
+    [data-testid="stSidebar"] .stMarkdown, 
+    [data-testid="stSidebar"] label, 
+    [data-testid="stSidebar"] span {
+        color: #333333 !important;
+    }
+
+    /* 3. 白色圓角卡片容器鎖定 */
     div[data-testid="stMetric"], div[data-testid="stDataFrame"], .stExpander {
         background-color: #FFFFFF !important;
         padding: 20px !important;
@@ -34,57 +39,63 @@ st.markdown("""
         box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.04) !important;
     }
     
-    /* Metric 標籤顏色微調 */
-    div[data-testid="stMetricLabel"] > div {
-        color: #6B7280 !important;
-        font-weight: 500;
+    /* 4. 🌟【科技藍紫】數字與指標數值鎖定 🌟 */
+    div[data-testid="stMetricValue"] > div,
+    div[data-testid="stMetricValue"] span,
+    div[data-testid="stMetricValue"] p {
+        color: #4F46E5 !important;
+        font-weight: 400 !important;
+        background: none !important;
+        -webkit-text-fill-color: initial !important; /* 保護 Emoji 原色 */
     }
     
-    /* Metric 數值改為單一科技藍 (移除漸層，保護 Emoji 原色) */
-    div[data-testid="stMetricValue"] > div {
-        color: #4F46E5 !important;
-        font-weight: 400;
+    /* 5. 🌟【強制純白】藍紫漸層按鈕文字鎖定 🌟 */
+    /* 提升選擇器特異性，確保覆蓋全域的黑色文字設定 */
+    .stButton>button, 
+    .stButton>button div, 
+    .stButton>button p, 
+    .stButton>button span {
+        color: #FFFFFF !important; /* 強制純白 */
+        font-weight: 600 !important;
     }
-
-    /* 藍紫色科技按鈕 (按鈕不含 Emoji 文字，保留漸層) */
+    
     .stButton>button {
         background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%) !important;
-        color: white !important;
         border: none !important;
         border-radius: 12px !important; 
         padding: 0.5rem 1rem !important;
-        font-weight: 600 !important;
-        width: 100%;
+        width: 100% !important;
         box-shadow: 0px 4px 10px rgba(79, 70, 229, 0.3) !important;
-        transition: all 0.3s ease-in-out;
-    }
-    .stButton>button:hover {
-        box-shadow: 0px 6px 15px rgba(124, 58, 237, 0.5) !important;
-        transform: translateY(-1px);
+        transition: all 0.3s ease-in-out !important;
     }
 
-    /* 文字輸入框與下拉選單外框設計 */
+    /* 6. 輸入框與選擇器樣式鎖定 */
     div[data-testid="stTextInput"] div[data-baseweb="input"], 
     .stSelectbox [data-testid="stSelectboxInput"], 
     .stNumberInput input, .stFileUploader section {
         border-radius: 8px !important;
         border: 1px solid #D1D5DB !important;
         background-color: #FFFFFF !important;
-        transition: all 0.2s ease-in-out;
+        color: #333333 !important;
     }
 
-    /* 標題改為單一科技藍 (移除漸層，保護 Emoji 原色) */
-    h1, h2, h3, h4 {
+    /* 7.所有 H 標題鎖定*/
+    h1, h2, h3, h4, 
+    h1 span, h2 span, h3 span, h4 span {
         color: #4F46E5 !important;
-        font-weight: bold;
+        font-weight: bold !important;
     }
     
-    /* 分隔線改為柔和灰色 */
-    hr {
-        border-color: #EBEBEB !important;
+    /* 8. 其他一般文字與清單鎖定深灰 */
+    .stMarkdown p, .stMarkdown li, span[data-testid="stMarkdownContainer"] p {
+        color: #333333 !important;
     }
+    
+    /* 分隔線鎖定 */
+    hr { border-color: #EBEBEB !important; }
 </style>
 """, unsafe_allow_html=True)
+
 
 # 契約價值倍率設定
 CONTRACT_MULTIPLIERS = {
